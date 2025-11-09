@@ -57,6 +57,35 @@ type Client struct {
 	AcctApplicationID           []*diam.AVP   // Acct applications
 	AuthApplicationID           []*diam.AVP   // Auth applications
 	VendorSpecificApplicationID []*diam.AVP   // Vendor specific applications
+	writeTimeout                time.Duration
+	readTimeout                 time.Duration
+	dialTimeout                 time.Duration
+}
+
+type DialOpt func(*Client)
+
+func WithWriteTimeout(writeTimeout time.Duration) DialOpt {
+	return func(cli *Client) {
+		if writeTimeout != 0 {
+			cli.writeTimeout = writeTimeout
+		}
+	}
+}
+
+func WithReadTimeout(readTimeout time.Duration) DialOpt {
+	return func(cli *Client) {
+		if readTimeout != 0 {
+			cli.readTimeout = readTimeout
+		}
+	}
+}
+
+func WithDialTimeout(dialTimeout time.Duration) DialOpt {
+	return func(cli *Client) {
+		if dialTimeout != 0 {
+			cli.dialTimeout = dialTimeout
+		}
+	}
 }
 
 // Dial calls the address set as ip:port, performs a handshake and optionally
@@ -84,6 +113,17 @@ func (cli *Client) DialTimeout(addr string, timeout time.Duration) (diam.Conn, e
 	return cli.DialExt("tcp", addr, timeout, nil)
 }
 
+// DialEx is like Dial, but with timeout for the dial and write
+func (cli *Client) DialEx(addr string, opts ...DialOpt) (diam.Conn, error) {
+	cli.dialTimeout = 3 * time.Second
+	cli.readTimeout = 1 * time.Second
+	cli.writeTimeout = 1 * time.Second
+	for _, opt := range opts {
+		opt(cli)
+	}
+	return cli.DialExt("tcp", addr, cli.dialTimeout, nil)
+}
+
 // DialTLS is like Dial, but using TLS.
 func (cli *Client) DialTLS(addr, certFile, keyFile string) (diam.Conn, error) {
 	return cli.DialTLSExt("tcp", addr, certFile, keyFile, 0, nil)
@@ -105,6 +145,12 @@ func (cli *Client) DialNetworkTLS(network, addr, certFile, keyFile string, laddr
 func (cli *Client) DialExt(network, addr string, timeout time.Duration, laddr net.Addr) (diam.Conn, error) {
 	return cli.dial(func() (diam.Conn, error) {
 		return diam.DialExt(network, addr, cli.Handler, cli.Dict, timeout, laddr)
+	})
+}
+
+func (cli *Client) DialExtOpts(network, addr string, laddr net.Addr) (diam.Conn, error) {
+	return cli.dial(func() (diam.Conn, error) {
+		return diam.DialExtOpts(network, addr, cli.Handler, cli.Dict, cli.dialTimeout, cli.writeTimeout, laddr)
 	})
 }
 
