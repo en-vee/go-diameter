@@ -18,7 +18,7 @@ import (
 	"sync"
 	"time"
 
-	"github.com/fiorix/go-diameter/v4/diam/dict"
+	"github.com/en-vee/go-diameter/v4/diam/dict"
 )
 
 // The Handler interface allow arbitrary objects to be
@@ -698,7 +698,7 @@ func (srv *Server) ListenAndServeTLS(certFile, keyFile string) error {
 		if err != nil {
 			return err
 		}
-	}	
+	}
 	conn, err := Listen(network, addr)
 	if err != nil {
 		return err
