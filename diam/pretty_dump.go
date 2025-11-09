@@ -8,9 +8,9 @@ import (
 	"strings"
 	"time"
 
-	"github.com/fiorix/go-diameter/v4/diam/avp"
-	"github.com/fiorix/go-diameter/v4/diam/datatype"
-	"github.com/fiorix/go-diameter/v4/diam/dict"
+	"github.com/en-vee/go-diameter/v4/diam/avp"
+	"github.com/en-vee/go-diameter/v4/diam/datatype"
+	"github.com/en-vee/go-diameter/v4/diam/dict"
 )
 
 func (m *Message) PrettyDump() string {

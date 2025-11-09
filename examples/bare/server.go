@@ -10,8 +10,8 @@ import (
 	"log"
 	"net"
 
-	"github.com/fiorix/go-diameter/v4/diam"
-	"github.com/fiorix/go-diameter/v4/diam/dict"
+	"github.com/en-vee/go-diameter/v4/diam"
+	"github.com/en-vee/go-diameter/v4/diam/dict"
 )
 
 func main() {
