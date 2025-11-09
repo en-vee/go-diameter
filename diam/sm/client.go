@@ -121,7 +121,7 @@ func (cli *Client) DialEx(addr string, opts ...DialOpt) (diam.Conn, error) {
 	for _, opt := range opts {
 		opt(cli)
 	}
-	return cli.DialExt("tcp", addr, cli.dialTimeout, nil)
+	return cli.DialExtOpts("tcp", addr, nil)
 }
 
 // DialTLS is like Dial, but using TLS.
@@ -150,7 +150,7 @@ func (cli *Client) DialExt(network, addr string, timeout time.Duration, laddr ne
 
 func (cli *Client) DialExtOpts(network, addr string, laddr net.Addr) (diam.Conn, error) {
 	return cli.dial(func() (diam.Conn, error) {
-		return diam.DialExtOpts(network, addr, cli.Handler, cli.Dict, cli.dialTimeout, cli.writeTimeout, laddr)
+		return diam.DialExtOpts(network, addr, cli.Handler, cli.Dict, cli.dialTimeout, cli.readTimeout, cli.writeTimeout, laddr)
 	})
 }
 

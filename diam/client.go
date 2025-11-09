@@ -66,9 +66,9 @@ func DialExt(
 }
 
 func DialExtOpts(
-	network, addr string, handler Handler, dp *dict.Parser, dialTimeout, writeTimeout time.Duration, laddr net.Addr) (Conn, error) {
+	network, addr string, handler Handler, dp *dict.Parser, dialTimeout, readTimeout, writeTimeout time.Duration, laddr net.Addr) (Conn, error) {
 
-	srv := &Server{Network: network, Addr: addr, Handler: handler, Dict: dp, LocalAddr: laddr, WriteTimeout: writeTimeout}
+	srv := &Server{Network: network, Addr: addr, Handler: handler, Dict: dp, LocalAddr: laddr, ReadTimeout: readTimeout, WriteTimeout: writeTimeout}
 	return dial(srv, dialTimeout)
 }
 
