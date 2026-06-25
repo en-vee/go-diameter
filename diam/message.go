@@ -165,7 +165,13 @@ func (m *Message) decodeAVPs(b []byte) error {
 			}
 		}
 		m.AVP = append(m.AVP, a)
-		n += a.Len()
+		advance := a.Length
+		if a.Data != nil {
+			advance = a.Len()
+		} else if advance == 0 {
+			return fmt.Errorf("decoded AVP at offset %d has no data and zero length", n)
+		}
+		n += advance
 	}
 	if len(decodeErrs) > 0 {
 		// Depending on the settings, this will be thrown by the state machine or passed to the best handler

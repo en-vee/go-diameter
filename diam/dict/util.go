@@ -124,6 +124,10 @@ retry:
 		goto retry
 	} else {
 		if codeU32, isUint32 := code.(uint32); isUint32 {
+			// Do not match a non-vendor AVP definition for a vendor-specific AVP on the wire.
+			if vendorID != 0 && vendorID != UndefinedVendorID {
+				return MakeUnknownAVP(origAppID, codeU32, vendorID), err
+			}
 			avp, err = p.FindAVP(origAppID, codeU32)
 			if err != nil {
 				return MakeUnknownAVP(origAppID, codeU32, vendorID), err

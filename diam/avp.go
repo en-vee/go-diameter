@@ -92,8 +92,12 @@ func (a *AVP) DecodeFromBytes(data []byte, application uint32, dictionary *dict.
 			hdrLength, n,
 		)
 	}
-	a.Data, err = datatype.Decode(dictAVP.Data.Type, payload)
+	a.Data, err = datatype.Decode(dictAVP.Data.Type, payload[:bodyLen])
 	if err != nil {
+		if unknown, unknownErr := datatype.Decode(datatype.UnknownType, payload[:bodyLen]); unknownErr == nil {
+			a.Data = unknown
+			return nil
+		}
 		return DecodeError(fmt.Errorf("%s(%d): %v", dictAVP.Name, dictAVP.Code, err))
 	}
 	// Handle grouped AVPs.
@@ -147,6 +151,12 @@ func (a *AVP) SerializeTo(b []byte) error {
 
 // Len returns the length of this AVP in bytes with padding.
 func (a *AVP) Len() int {
+	if a.Data == nil {
+		if a.Length > 0 {
+			return a.Length
+		}
+		return a.headerLen()
+	}
 	return a.headerLen() + a.Data.Len() + a.Data.Padding()
 }
 

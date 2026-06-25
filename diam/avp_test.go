@@ -148,6 +148,29 @@ func TestEncodeAVPWithoutData(t *testing.T) {
 	}
 }
 
+func TestDecodeUnknownVendorSpecificAVP(t *testing.T) {
+	const unknownCode uint32 = 99999
+	const vendorID uint32 = 35838
+	a := NewAVP(unknownCode, avp.Mbit|avp.Vbit, vendorID, datatype.OctetString("vendor-data"))
+	b, err := a.Serialize()
+	if err != nil {
+		t.Fatal(err)
+	}
+	decoded, err := DecodeAVP(b, 4, dict.Default)
+	if err != nil {
+		t.Fatalf("decode unknown vendor AVP: %v", err)
+	}
+	if decoded.Data == nil {
+		t.Fatal("decoded vendor AVP has nil Data")
+	}
+	if decoded.VendorID != vendorID {
+		t.Fatalf("VendorID = %d, want %d", decoded.VendorID, vendorID)
+	}
+	if decoded.Len() == 0 {
+		t.Fatal("Len() must not be zero")
+	}
+}
+
 func BenchmarkDecodeAVP(b *testing.B) {
 	for n := 0; n < b.N; n++ {
 		DecodeAVP(testAVP[0], 1, dict.Default)
