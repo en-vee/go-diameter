@@ -114,14 +114,13 @@ func (cli *Client) DialTimeout(addr string, timeout time.Duration) (diam.Conn, e
 }
 
 // DialEx is like Dial, but with timeout for the dial and write
+// DialEx is like Dial, but with timeout for the dial and write
 func (cli *Client) DialEx(addr string, opts ...DialOpt) (diam.Conn, error) {
-	// cli.dialTimeout = 3 * time.Second
-	// cli.readTimeout = 1 * time.Second
-	// cli.writeTimeout = 1 * time.Second
 	for _, opt := range opts {
 		opt(cli)
 	}
-	return cli.DialExtOpts("tcp", addr, nil)
+	network, addr := parseDialNetwork(addr)
+	return cli.DialExtOpts(network, addr, nil)
 }
 
 // DialTLS is like Dial, but using TLS.
